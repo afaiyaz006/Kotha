@@ -9,7 +9,8 @@ export default function Home() {
     const handleLogin = (event: React.FormEvent) => {
         event.preventDefault();
         if (username.trim()) {
-            router.push(`/chat?username=${username}`);
+            localStorage.setItem('username',username)
+            router.push(`/chat`);
         } else {
             alert("Please enter a username!");
         }

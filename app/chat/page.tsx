@@ -2,9 +2,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from "socket.io-client";
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react'
+
 export default function Chat() {
 
-  const searchParams = useSearchParams();
+  
   const [messages, setMessages] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const socketRef = useRef<any>(null)
@@ -80,7 +82,7 @@ export default function Chat() {
         },
       }
     );
-    const username = searchParams.get('username');
+    const username = localStorage.getItem('username') || 'anon';
     if (username) {
         setUsername(username);
     } else {
@@ -146,7 +148,7 @@ export default function Chat() {
     }
 
 
-    },[])
+    })
 
     function sendMessage(event: any) {
       event.preventDefault()
