@@ -78,9 +78,6 @@ export default function Chat() {
         extraHeaders: {
           "my-custom-header": process.env.NEXT_PUBLIC_SECRET_HEADER_VALUE || ''
         },
-        
-      
-
       }
     );
     const username = searchParams.get('username');
