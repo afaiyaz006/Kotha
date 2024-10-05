@@ -1,8 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
 import { io } from "socket.io-client";
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react'
+
 
 export default function Chat() {
 
@@ -10,7 +9,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const socketRef = useRef<any>(null)
-  const [username, setUsername] = useState('')
+  const [username, setUsername] = useState('anon')
   const [selectUser, setSelectUser] = useState(String)
   
   const handleSelectUser = (event: any) => {
@@ -82,14 +81,14 @@ export default function Chat() {
         },
       }
     );
-    const username = localStorage.getItem('username') || 'anon';
-    if (username) {
-        setUsername(username);
-    } else {
-       
-        alert("No username found! Redirecting to home.");
-        window.location.href = '/';
+    const usernameGet=localStorage.getItem('username')
+    if(usernameGet){
+      setUsername(usernameGet)
     }
+    else {
+      alert("No username found! Redirecting to home.");
+      window.location.href = '/';
+  }
     socketRef.current = socket
     
     
@@ -148,7 +147,7 @@ export default function Chat() {
     }
 
 
-    })
+    },[username])
 
     function sendMessage(event: any) {
       event.preventDefault()

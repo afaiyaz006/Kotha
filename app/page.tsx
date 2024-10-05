@@ -20,7 +20,7 @@ export default function Home() {
         <div className="container mx-auto min-h-screen flex items-center justify-center">
             <div className="w-full max-w-md mx-2 border-2 border-slate-950 p-4">
                 <div className="text-center text-4xl mb-4">
-                    kotha-chat bolo
+                    Kotha-Chat
                 </div>
                 <div className="shadow-lg p-6 border-2 border-slate-950">
                     <form onSubmit={handleLogin} className="flex flex-col gap-y-3">
