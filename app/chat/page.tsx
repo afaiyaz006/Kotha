@@ -73,12 +73,12 @@ export default function Chat() {
   })
 
   useEffect(() => {
-
+    console.log("HEADER: "+process.env.NEXT_PUBLIC_SECRET_HEADER!)
     const socket = io(process.env.NEXT_PUBLIC_CLOUD_SERVER,
       {
         withCredentials: true,
         extraHeaders: {
-          "my-custom-header": process.env.NEXT_PUBLIC_SECRET_HEADER_VALUE || ''
+          "my-custom-header": process.env.NEXT_PUBLIC_SECRET_HEADER! || ''
         },
       }
     );
