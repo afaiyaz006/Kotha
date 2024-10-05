@@ -11,33 +11,30 @@ export default function Chat() {
   const socketRef = useRef<any>(null)
   const [username, setUsername] = useState('anon')
   const [selectUser, setSelectUser] = useState(String)
-  const [selectUserId,setUserId] = useState(String)
+  const [selectUserId,setSelectUserId] = useState(String)
   const [is_connected,setIsConnected] = useState(false)
   const [socketuserId,setSocketUserId] = useState('')
+  const [chatcounter,setChatCounter] = useState(new Map())
   
-  const handleSelectUser = (event: any) => {
-    const user_name = event.currentTarget.querySelector('div').textContent
-    setSelectUser(user_name)
-    let toUserid=''
-    
-    for(let i=0;i<users.length;i++){
-        // inefficient need to change later
-        if (users[i][1].username==selectUser){
-          toUserid=users[i][0]
-          break
-        }
+ 
+  const handleSelectUser = (userId:string,username:string) => {
+    if(userId){
+      setSelectUserId(userId)
     }
-    setUserId(toUserid)
+    if(username){
+      setSelectUser(username)
+    }
   }
 
   const allUsers = users.map(([userId, userInfo]) => {
-    
+    const number_of_messages = chatcounter.get(userId)
+  
     if (userId != socketuserId) {
       return (
         <div className="flex flex-row " key={userId}>
-          <a href="#" onClick={handleSelectUser} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
+          <a href="#" onClick={()=>handleSelectUser(userId,userInfo.username)} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
             <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
-              {userInfo.username}
+              {userInfo.username} {number_of_messages?number_of_messages:''}
             </div>
           </a>
         </div>
@@ -61,7 +58,7 @@ export default function Chat() {
   const allMessages = messages.map((message, index) => {
     
     
-    if (message.from==username.toString()){
+    if (message.from_userId==socketuserId){
       return (
         <div className="flex flex-col border-2 border-slate-950 my-1 p-1 ml-5 mx-1" key={index}>
           <strong>YOU</strong>
@@ -71,18 +68,20 @@ export default function Chat() {
         </div>
       )
     }
-    else{
-
+    else if(message.from_userId==selectUserId){
+      
       return (
         <div className="flex flex-col border-2 border-slate-950 my-1 p-1 mr-5 mx-1" key={index}>
-          <strong>{message.from}</strong>
+          <strong>{message.from_username}</strong>
           <div>
             {message.content}
           </div>
         </div>
       )
     }
+    
   })
+  
 
   useEffect(() => {
     //console.log("HEADER: "+process.env.NEXT_PUBLIC_SECRET_HEADER!)
@@ -143,12 +142,16 @@ export default function Chat() {
 
     })
     
-    socket.on("private_message",({content,from,to})=>{
+    socket.on("private_message",({content,from_username,from_userId,to})=>{
+      setMessages(messages=>[...messages,{
+        content:content,
+        from_username:from_username,
+        from_userId:from_userId,
+        to:to}])
       
-      setMessages(messages=>[...messages,{content:content,from:from,to:to}])
-      
-      
+            
     })
+
     socket.on("all_users",(users)=>{
       
       setUsers(users)
@@ -168,28 +171,22 @@ export default function Chat() {
     function sendMessage(event: any) {
       event.preventDefault()
       const message = event.target.elements.message_box.value
-      let toUserid=''
-      for(let i=0;i<users.length;i++){
-        
-        if (users[i][1].username==selectUser){
-          toUserid=users[i][0]
-          break
-        }
-      }
     
-      if(toUserid!=''){
+    
+      if(selectUserId){
         socketRef.current.emit("private_message",
           {
             content:message,
-            to:toUserid
+            to:selectUserId
           }
         )
       }
       if(selectUser){
         setMessages(messages=>[...messages,{
             content:message,
+            from_username:username,
+            from_userId:socketuserId,
             to:selectUser,
-            from:username
         }])
 
       }
@@ -232,7 +229,7 @@ export default function Chat() {
             </div>
             <div className="basis-1/2  hover:shadow-lg shadow-sm border-2 border-slate-950 my-1">
               <p className='p-1'>Messages will appear here</p>
-              <p className="p-2">Click a user to chat with. Currently Chatting with <strong>{selectUser}</strong></p>
+              <p className="p-2">Click a active user to open chatbox. <strong>{selectUser}</strong></p>
               <div className="scrollbar scrollbar-thumb-sky-700 scrollbar-track-sky-300  h-64 overflow-y-scroll">
               {allMessages}
               </div>

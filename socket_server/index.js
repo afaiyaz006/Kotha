@@ -68,8 +68,8 @@ socket_server.on("connection",(socket)=>{
     })
   usermanager.addUser(socket.userId,{
       username:socket.handshake.auth.username,
-       sessionId:socket.sessionId
-     })
+      //sessionId:socket.sessionId
+  })
 
   userSerialized=usermanager.getAllUsers()
   ///console.log(userSerialized.length)
@@ -90,10 +90,11 @@ socket_server.on("connection",(socket)=>{
   ///console.log(usermanager.getUser(socket.userId).username)
   
   socket.on("private_message",({content,to})=>{
-    console.log("CAUGHT MESSAGE: ",content,to)
+    //console.log("CAUGHT MESSAGE: ",content,to,socket.username,socket.userId)
     socket.to(to).to(socket.userId).emit("private_message",{
       content,
-      from:socket.username,
+      from_username:socket.username,
+      from_userId:socket.userId,
       to:to
     })
   })
