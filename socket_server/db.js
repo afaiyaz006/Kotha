@@ -2,6 +2,7 @@ class UserManager {
     constructor() {
         this.users = new Map();
         this.sessionInfos = new Map();
+        //this.users_name_wise = new Map()
     }
 
     addUser(userId, userInfo) {
@@ -10,6 +11,7 @@ class UserManager {
 
     removeUser(userId) {
         this.users.delete(userId);
+    
     }
 
     getAllUsers() {
@@ -20,6 +22,7 @@ class UserManager {
         return this.users.get(userId);
     }
 
+    
     getSession(sessionId) {
         return this.sessionInfos.get(sessionId);
     }

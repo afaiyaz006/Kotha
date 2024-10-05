@@ -11,16 +11,28 @@ export default function Chat() {
   const socketRef = useRef<any>(null)
   const [username, setUsername] = useState('anon')
   const [selectUser, setSelectUser] = useState(String)
+  const [selectUserId,setUserId] = useState(String)
+  const [is_connected,setIsConnected] = useState(false)
+  const [socketuserId,setSocketUserId] = useState('')
   
   const handleSelectUser = (event: any) => {
     const user_name = event.currentTarget.querySelector('div').textContent
     setSelectUser(user_name)
-
+    let toUserid=''
+    
+    for(let i=0;i<users.length;i++){
+        // inefficient need to change later
+        if (users[i][1].username==selectUser){
+          toUserid=users[i][0]
+          break
+        }
+    }
+    setUserId(toUserid)
   }
 
   const allUsers = users.map(([userId, userInfo]) => {
-  
-    if (userInfo.username != username.toString()) {
+    
+    if (userId != socketuserId) {
       return (
         <div className="flex flex-row " key={userId}>
           <a href="#" onClick={handleSelectUser} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
@@ -31,7 +43,7 @@ export default function Chat() {
         </div>
       )
     }
-    else {
+    else{
       return (
         <div className="flex flex-row " key={userId}>
           <a href="#" className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
@@ -47,7 +59,8 @@ export default function Chat() {
 
 
   const allMessages = messages.map((message, index) => {
-  
+    
+    
     if (message.from==username.toString()){
       return (
         <div className="flex flex-col border-2 border-slate-950 my-1 p-1 ml-5 mx-1" key={index}>
@@ -88,8 +101,9 @@ export default function Chat() {
     else {
       alert("No username found! Redirecting to home.");
       window.location.href = '/';
-  }
+    }
     socketRef.current = socket
+    
     
     
     const sessionId=localStorage.getItem('sessionId')
@@ -113,7 +127,7 @@ export default function Chat() {
     
     socket.on("connect",()=>{
       console.log("Connected to server")
-        
+      setIsConnected(true)
         
     })
     socket.on("session",({sessionId,userId})=>{
@@ -124,6 +138,7 @@ export default function Chat() {
       }
       localStorage.setItem("sessionId",sessionId)
       localStorage.setItem(sessionId.toString(),userId.toString())
+      setSocketUserId(userId.toString())
       //console.log("USERID: ",userId,"SESSIONID: ",sessionId,"username: ",username)  
 
     })
@@ -131,7 +146,8 @@ export default function Chat() {
     socket.on("private_message",({content,from,to})=>{
       
       setMessages(messages=>[...messages,{content:content,from:from,to:to}])
-        
+      
+      
     })
     socket.on("all_users",(users)=>{
       
@@ -175,11 +191,13 @@ export default function Chat() {
             to:selectUser,
             from:username
         }])
+
       }
       
       
 
     }
+    
 
     return (
       <div className="container mx-auto">
@@ -192,7 +210,7 @@ export default function Chat() {
           <div className="flex flex-col-reverse space-x-2 rounded-xl shadow-lg sm:flex-row">
 
             <div className="basis-1/4  hover:shadow-lg shadow-sm border-2 border-slate-950 my-1 ">
-              <div className="flex flex-col p-3 overflow-y-scroll">
+              <div className="p-3 scrollbar scrollbar-thumb-sky-700 scrollbar-track-sky-300  h-64 overflow-y-scroll">
                
                 <div className="flex">
                   
@@ -206,6 +224,7 @@ export default function Chat() {
                   </div>
                 </div>
                 <div className="flex flex-col font-bold">
+                  {is_connected?"Connected":"Connecting....."}
                   {allUsers}
                 </div>
 
@@ -213,15 +232,15 @@ export default function Chat() {
             </div>
             <div className="basis-1/2  hover:shadow-lg shadow-sm border-2 border-slate-950 my-1">
               <p className='p-1'>Messages will appear here</p>
-              <p className="p-2">Chat with <strong>{selectUser}</strong></p>
-              <div className="flex flex-col overflow-auto scroll-smooth focus:scroll-auto">
+              <p className="p-2">Click a user to chat with. Currently Chatting with <strong>{selectUser}</strong></p>
+              <div className="scrollbar scrollbar-thumb-sky-700 scrollbar-track-sky-300  h-64 overflow-y-scroll">
               {allMessages}
               </div>
               <form onSubmit={sendMessage}>
                 <div className="flex flex-col">
                   <strong className="m-1">Send Message:</strong>
 
-                  <textarea className="border-2 border-black p-1 m-1 row-5" id="message_box"></textarea>
+                  <textarea className="border-2 border-slate-700 focus:border-slate-950 p-1 m-1 row-5 focus:outline-none" id="message_box"></textarea>
                   <button type="submit" className="border-2 border-slate-900 p-1 m-3 hover:bg-green-600">
                     <p className="text-center">Send Message</p>
                   </button>

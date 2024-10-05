@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation'; // For Next.js 13 and newer
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-    const [username, setUsername] = useState<string>("");
+    const [username, setUsername] = useState<string>('');
     const router = useRouter();
 
     const handleLogin = (event: React.FormEvent) => {
@@ -15,7 +15,12 @@ export default function Home() {
             alert("Please enter a username!");
         }
     }
-
+    useEffect(()=>{
+        const getUsername=localStorage.getItem('username')
+        if(getUsername!=undefined){
+            router.push('/chat')
+        }
+    })
     return (
         <div className="container mx-auto min-h-screen flex items-center justify-center">
             <div className="w-full max-w-md mx-2 border-2 border-slate-950 p-4">
@@ -28,13 +33,16 @@ export default function Home() {
                         <p className="text-center">
                             Enter username, no Signup required...
                         </p>
-                        <label className="text-center">Username: </label>
+                
+                        
                         <input
                             type="text"
-                            className="border-2 border-black p-2 rounded"
+                            className="border-2 border-black p-2 rounded flex "
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            placeholder='Username'
                         />
+                      
                         <button
                             type="submit"
                             className="border-2 border-slate-900 hover:bg-green-600 p-2 rounded mt-4"
