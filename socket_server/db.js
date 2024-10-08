@@ -2,11 +2,13 @@ class UserManager {
     constructor() {
         this.users = new Map();
         this.sessionInfos = new Map();
+        
         //this.users_name_wise = new Map()
     }
 
     addUser(userId, userInfo) {
         this.users.set(userId, userInfo);
+       
     }
 
     removeUser(userId) {
@@ -38,6 +40,8 @@ class UserManager {
     getAllSessions() {
         return [...this.sessionInfos.entries()]; 
     }
+
+
 }
 
 module.exports = {

@@ -95,7 +95,7 @@ socket_server.on("connection",(socket)=>{
       content,
       from_username:socket.username,
       from_userId:socket.userId,
-      to:to
+      to:to,  
     })
   })
 
@@ -109,7 +109,7 @@ socket_server.on("connection",(socket)=>{
     console.log("Disconnected from a client")
   })
   
-
+  
 
 
 

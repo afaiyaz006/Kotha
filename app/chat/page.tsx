@@ -14,7 +14,7 @@ export default function Chat() {
   const [selectUserId,setSelectUserId] = useState(String)
   const [is_connected,setIsConnected] = useState(false)
   const [socketuserId,setSocketUserId] = useState('')
-  const [chatcounter,setChatCounter] = useState(new Map())
+  
   
  
   const handleSelectUser = (userId:string,username:string) => {
@@ -26,37 +26,10 @@ export default function Chat() {
     }
   }
 
-  const allUsers = users.map(([userId, userInfo]) => {
-    const number_of_messages = chatcounter.get(userId)
   
-    if (userId != socketuserId) {
-      return (
-        <div className="flex flex-row " key={userId}>
-          <a href="#" onClick={()=>handleSelectUser(userId,userInfo.username)} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
-            <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
-              {userInfo.username} {number_of_messages?number_of_messages:''}
-            </div>
-          </a>
-        </div>
-      )
-    }
-    else{
-      return (
-        <div className="flex flex-row " key={userId}>
-          <a href="#" className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
-            <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
-              {userInfo.username}(YOU)
-            </div>
-          </a>
-        </div>
-      )
-
-    }
-  })
 
 
   const allMessages = messages.map((message, index) => {
-    
     
     if (message.from_userId==socketuserId){
       return (
@@ -81,11 +54,54 @@ export default function Chat() {
     }
     
   })
+  const countMessagesForUser = (userId: string) => {
+    return messages.filter((message) => message.from_userId === userId).length;
+  };
+  const allUsers = users.map(([userId, userInfo]) => {
+    const counter=countMessagesForUser(userId)
+    
   
+    if (userId != socketuserId) {
+      return (
+        <div className="flex flex-row " key={userId}>
+          <a href="#" onClick={()=>handleSelectUser(userId,userInfo.username)} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
+            <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
+              {userInfo.username}{(selectUser==userId)?'':counter?"("+counter+")":''}
+            </div>
+          </a>
+        </div>
+      )
+    }
+    else{
+      return (
+        <div className="flex flex-row " key={userId}>
+          <a href="#" className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
+            <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
+              {userInfo.username}(YOU)
+            </div>
+          </a>
+        </div>
+      )
+
+    }
+  })
+
+
 
   useEffect(() => {
     //console.log("HEADER: "+process.env.NEXT_PUBLIC_SECRET_HEADER!)
-    const socket = io(process.env.NEXT_PUBLIC_CLOUD_SERVER,
+    
+    var server_string=''
+    if (process.env.NEXT_PUBLIC_DEBUG=='True'){
+        server_string=process.env.NEXT_PUBLIC_CLIENT_SIDE_SERVER||''
+       
+    }
+    else{
+        server_string=process.env.NEXT_PUBLIC_CLOUD_SERVER||''
+      
+    }
+    
+    const socket = io(server_string,
       {
         withCredentials: true,
         extraHeaders: {
@@ -142,15 +158,19 @@ export default function Chat() {
 
     })
     
-    socket.on("private_message",({content,from_username,from_userId,to})=>{
-      setMessages(messages=>[...messages,{
-        content:content,
-        from_username:from_username,
-        from_userId:from_userId,
-        to:to}])
-      
-            
+    socket.on("private_message",({content,from_username,from_userId,to,counter})=>{
+        setMessages(messages=>[...messages,{
+              content:content,
+              from_username:from_username,
+              from_userId:from_userId,
+              to:to,
+             
+            }
+          ]
+        )
     })
+
+    
 
     socket.on("all_users",(users)=>{
       
@@ -187,6 +207,7 @@ export default function Chat() {
             from_username:username,
             from_userId:socketuserId,
             to:selectUser,
+          
         }])
 
       }
@@ -221,13 +242,14 @@ export default function Chat() {
                   </div>
                 </div>
                 <div className="flex flex-col font-bold">
-                  {is_connected?"Connected":"Connecting....."}
+                  
                   {allUsers}
                 </div>
 
               </div>
             </div>
             <div className="basis-1/2  hover:shadow-lg shadow-sm border-2 border-slate-950 my-1">
+              <strong className="p-2 mx-auto">Connection Status: {is_connected?"Connected":"Connecting....."}</strong>
               <p className='p-1'>Messages will appear here</p>
               <p className="p-2">Click a active user to open chatbox. <strong>{selectUser}</strong></p>
               <div className="scrollbar scrollbar-thumb-sky-700 scrollbar-track-sky-300  h-64 overflow-y-scroll">
