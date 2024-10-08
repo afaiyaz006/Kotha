@@ -66,7 +66,7 @@ export default function Chat() {
         <div className="flex flex-row " key={userId}>
           <a href="#" onClick={()=>handleSelectUser(userId,userInfo.username)} className="rounded  border-2 border-slate-900 my-1 hover:bg-blue-400">
             <div className="text-justify text-md align-text-bottom text-slate-900 p-2">
-              {userInfo.username}{(selectUser==userId)?'':counter?"("+counter+")":''}
+              {userInfo.username}{(selectUserId==userId)?'':counter?"("+counter+")":''}
             </div>
           </a>
         </div>
