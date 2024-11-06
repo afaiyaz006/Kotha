@@ -221,7 +221,7 @@ export default function Chat() {
               Connection Status:{" "}
               {is_connected ? "Connected" : "Connecting....."}
             </strong>
-            <p className="p-1">messages_between_users will appear here</p>
+            <p className="p-1">Messages will appear here</p>
             <p className="p-2">
               Click a active user to open chatbox. <strong>{selectUser}</strong>
             </p>

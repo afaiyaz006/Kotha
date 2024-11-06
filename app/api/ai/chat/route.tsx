@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   
   const result = await streamText({
     model: groq('mixtral-8x7b-32768'),
-    system: 'You are a helpful assistant that analyzes chat between two users.One is the user defined as `You` another is the other party suggest probable replies and be helpful.',
+    system: 'You are a helpful assistant that analyzes chat between two users.One is the user defined as `You` another is the other party suggest probable replies for `You` and be helpful.',
     messages,
   });
 
